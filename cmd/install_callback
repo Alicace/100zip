@@ -1,0 +1,4 @@
+#!/bin/bash
+### 安装后调用：准备数据目录
+mkdir -p "${TRIM_PKGVAR}/data" "${TRIM_PKGVAR}/logs" 2>/dev/null
+exit 0

@@ -1,0 +1,29 @@
+{
+  ".url": {
+    "100zip.main": {
+      "title": "100解压",
+      "icon": "images/icon_{0}.png",
+      "type": "iframe",
+      "protocol": "",
+      "gatewayPrefix": "/app/100zip",
+      "gatewaySocket": "app.sock",
+      "url": "/app/100zip/",
+      "allUsers": true
+    },
+    "100zip.open": {
+      "title": "用 100解压 打开",
+      "icon": "images/icon_{0}.png",
+      "type": "iframe",
+      "protocol": "",
+      "gatewayPrefix": "/app/100zip",
+      "gatewaySocket": "app.sock",
+      "url": "/app/100zip/",
+      "allUsers": true,
+      "fileTypes": [
+        "001", "7z", "zip", "rar", "tar", "tgz", "tbz", "tbz2", "txz",
+        "gz", "bz2", "xz", "zst", "tzst", "lz4", "cab", "iso", "arj", "lzh", "lha"
+      ],
+      "noDisplay": true
+    }
+  }
+}

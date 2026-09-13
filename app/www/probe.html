@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>100zip · SDK 诊断</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">100zip · SDK 诊断</div>
+    <nav class="tabs"><a class="tab active" href="index.html">返回应用</a></nav>
+  </header>
+  <main>
+    <div class="card">
+      <p class="hint">本页用于确认飞牛宿主是否注入了文件授权 SDK。请把下面的内容整段截图或复制给开发者。</p>
+      <pre id="report" style="white-space:pre-wrap; word-break:break-all; background:#15181d; border:1px solid #2a2f39; border-radius:8px; padding:12px; max-height:60vh; overflow:auto;">检测中…</pre>
+      <button id="btnCopy" class="ghost">复制报告</button>
+    </div>
+  </main>
+  <script type="module">
+    import bridge from "./js/fnos-bridge.js";
+    const info = {
+      href: location.href,
+      isTop: window === window.top,
+      hostname: location.hostname,
+      ua: navigator.userAgent,
+      bridge: bridge.describe(),
+    };
+    document.getElementById("report").textContent = JSON.stringify(info, null, 2);
+    document.getElementById("btnCopy").addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(JSON.stringify(info, null, 2)); } catch (e) {}
+    });
+  </script>
+</body>
+</html>

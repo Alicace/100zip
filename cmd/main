@@ -1,0 +1,145 @@
+#!/bin/bash
+# 100zip 生命周期脚本：start / stop / status
+#
+# 兼容性要求（重要）：
+#   平台可能用 sh(dash) 或 bash 调用本脚本 —— 因此**全程只使用 POSIX sh 语法**：
+#   不使用数组、不使用 $'...'、不使用 [[ ]]。曾因使用 bash 数组导致脚本解析失败、应用无法启动。
+#
+# 诊断：每次被调用都会先往 /tmp/100zip-lifecycle.log 追加一行环境快照，
+#       即使后续步骤失败也能据此定位。
+
+DIAG="/tmp/100zip-lifecycle.log"
+TS="$(date '+%Y-%m-%d %H:%M:%S')"
+
+diag() {
+  echo "$(date '+%Y-%m-%d %H:%M:%S') [$$] $*" >> "$DIAG" 2>/dev/null
+}
+
+fail_msg() {
+  [ -n "$TRIM_TEMP_LOGFILE" ] && echo "100zip: $1" >> "$TRIM_TEMP_LOGFILE" 2>/dev/null
+}
+
+DEST="${TRIM_APPDEST:-/var/apps/100zip/target}"
+VAR="${TRIM_PKGVAR:-/var/apps/100zip/var}"
+
+diag "invoked: cmd='$1' shell=$0 user=$(id -un 2>/dev/null) DEST=$DEST VAR=$VAR"
+
+# 日志目录：先创建，保证后续每一步都能留痕
+LOG_DIR="${VAR}/logs"
+mkdir -p "$LOG_DIR" "${VAR}/data" 2>/dev/null
+if [ ! -d "$LOG_DIR" ]; then
+  LOG_DIR="${DEST}/logs"
+  mkdir -p "$LOG_DIR" 2>/dev/null
+fi
+LOG_FILE="${LOG_DIR}/app.log"
+
+log_msg() {
+  echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE" 2>/dev/null
+}
+
+# 二进制候选
+BIN=""
+for c in "${DEST}/bin/100zip" "${DEST}/app/bin/100zip"; do
+  if [ -x "$c" ]; then
+    BIN="$c"
+    break
+  fi
+done
+if [ -z "$BIN" ]; then
+  diag "ERROR binary not executable under $DEST (ls: $(ls -l "$DEST/bin" 2>&1 | head -3 | tr '\n' ';'))"
+  log_msg "ERROR: binary not found under $DEST"
+  fail_msg "binary not found under $DEST"
+  exit 1
+fi
+diag "resolved BIN=$BIN"
+
+# 静态目录候选
+WWW=""
+for d in "${DEST}/www" "${DEST}/app/www"; do
+  if [ -d "$d" ]; then
+    WWW="$d"
+    break
+  fi
+done
+diag "resolved WWW=${WWW:-none} LOG=$LOG_FILE"
+
+SOCK="${DEST}/app.sock"
+PID_FILE="${VAR}/100zip.pid"
+
+is_running() {
+  [ -f "$PID_FILE" ] || return 1
+  P="$(head -n 1 "$PID_FILE" 2>/dev/null | tr -d '[:space:]')"
+  [ -n "$P" ] || return 1
+  kill -0 "$P" 2>/dev/null
+}
+
+start_app() {
+  if is_running; then
+    diag "already running"
+    return 0
+  fi
+  [ -S "$SOCK" ] && rm -f "$SOCK"
+  log_msg "Starting 100zip... bin=$BIN www=${WWW:-none} var=$VAR"
+  diag "exec: $BIN --socket $SOCK --data $VAR/data --www ${WWW:-none}"
+
+  if [ -n "$WWW" ]; then
+    nohup "$BIN" --socket "$SOCK" --data "${VAR}/data" --www "$WWW" >> "$LOG_FILE" 2>&1 &
+  else
+    nohup "$BIN" --socket "$SOCK" --data "${VAR}/data" >> "$LOG_FILE" 2>&1 &
+  fi
+  echo $! > "$PID_FILE"
+
+  i=0
+  while [ "$i" -lt 20 ]; do
+    if [ -S "$SOCK" ]; then
+      diag "socket ready after $((i * 5 / 10))s"
+      return 0
+    fi
+    sleep 0.5
+    i=$((i + 1))
+  done
+  diag "ERROR socket not ready in 10s; log tail: $(tail -n 5 "$LOG_FILE" 2>/dev/null | tr '\n' ';')"
+  log_msg "ERROR: socket not ready after 10s"
+  fail_msg "socket not ready after 10s (see $LOG_FILE)"
+  return 1
+}
+
+stop_app() {
+  if ! is_running; then
+    rm -f "$PID_FILE" "$SOCK" 2>/dev/null
+    diag "stop: not running"
+    return 0
+  fi
+  P="$(head -n 1 "$PID_FILE" | tr -d '[:space:]')"
+  log_msg "Stopping 100zip (pid $P)..."
+  kill -TERM "$P" 2>/dev/null
+  i=0
+  while kill -0 "$P" 2>/dev/null && [ "$i" -lt 40 ]; do
+    sleep 0.5
+    i=$((i + 1))
+  done
+  if kill -0 "$P" 2>/dev/null; then
+    kill -KILL "$P" 2>/dev/null
+  fi
+  rm -f "$PID_FILE" "$SOCK" 2>/dev/null
+  diag "stopped pid $P"
+  return 0
+}
+
+status_app() {
+  if is_running; then
+    return 0
+  fi
+  return 3
+}
+
+case "$1" in
+  start)  start_app ;;
+  stop)   stop_app ;;
+  status) status_app ;;
+  *)
+    diag "unknown command: $1"
+    fail_msg "unknown command: $1"
+    exit 1
+    ;;
+esac

@@ -1,0 +1,42 @@
+{
+  "name": "@trimjs/web-app",
+  "version": "0.4.2",
+  "description": "web app sdk for nas",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "dev": "vp dev",
+    "build": "vp build",
+    "lint": "vp lint .",
+    "test": "vp test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.21.4",
+    "@fn/micro-app-event": "workspace:*",
+    "@fn/micro-app-postmate": "workspace:*",
+    "@rollup/plugin-babel": "^6.1.0",
+    "@typescript/typescript6": "catalog:",
+    "terser": "^5.46.0",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>100zip · 授权回调</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <main>
+    <div class="card" style="margin-top:40px">
+      <h2>正在处理授权结果…</h2>
+      <pre id="detail" style="white-space:pre-wrap; word-break:break-all; color:#98a0b3;"></pre>
+    </div>
+  </main>
+  <script type="module">
+    import bridge from "./js/fnos-bridge.js";
+    const result = bridge.parseCallback(location.href);
+    document.getElementById("detail").textContent = JSON.stringify(result, null, 2);
+
+    // 提取授权到的路径（不同版本字段名可能不同，逐个兜底）
+    const paths = []
+      .concat(result.paths || [])
+      .concat(result.data || [])
+      .concat(result.path ? [result.path] : [])
+      .filter((p) => typeof p === "string" && p.startsWith("/"));
+    if (paths.length) bridge.setPendingPaths(paths);
+
+    const state = sessionStorage.getItem("100zip.authState");
+    if (result.state && state && result.state !== state) {
+      document.getElementById("detail").textContent += "\n\n⚠️ state 校验失败，已忽略本次结果";
+    }
+    setTimeout(() => { location.replace("/app/100zip/"); }, 1200);
+  </script>
+</body>
+</html>

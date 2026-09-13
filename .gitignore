@@ -1,0 +1,27 @@
+# 构建产物
+/build/
+/dist/
+/app/bin/
+/tmp/
+
+# 本地缓存（引擎归档与解包）
+/refs/vendor/_extract/
+*.tar.xz
+
+# 本地研究资料、第三方源码快照与测试证据（不随源码发布）
+/refs/
+
+# 本地 Python 运行环境与下载缓存
+/tools/pylibs/
+/tools/downloads/
+/tools/bin/
+/tools/7zip-extracted/
+__pycache__/
+*.pyc
+
+# Go
+*.test
+
+# 编辑器
+.DS_Store
+Thumbs.db

@@ -1,0 +1,12 @@
+#!/bin/bash
+### 修改应用设置后调用。
+### 重要：用户授权目录通过环境变量 TRIM_DATA_ACCESSIBLE_PATHS 在**进程启动时**注入，
+### 因此设置变更后必须重启服务，否则新授权的目录不会生效。
+
+SCRIPT_DIR="$(dirname "$0")"
+
+"$SCRIPT_DIR/main" stop  >/dev/null 2>&1
+sleep 1
+"$SCRIPT_DIR/main" start >/dev/null 2>&1
+
+exit 0

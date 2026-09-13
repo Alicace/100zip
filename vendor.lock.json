@@ -1,0 +1,14 @@
+{
+  "7zip": {
+    "version": "26.03",
+    "arch": {
+      "linux-x64": {
+        "file": "app/vendor/7zip/linux-x64/7zzs",
+        "sha256": "eab4c8d7f193e3d6d3237370bbcaa879a160a3f1dc82202207e27baeab79b6ac",
+        "bytes": 3767416,
+        "license": "app/vendor/7zip/linux-x64/License.txt"
+      }
+    }
+  },
+  "generatedAt": "2026-09-12T22:54:30"
+}

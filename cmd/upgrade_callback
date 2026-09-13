@@ -1,0 +1,4 @@
+#!/bin/bash
+### 升级后调用：数据目录保持，不覆盖用户设置
+mkdir -p "${TRIM_PKGVAR}/data" "${TRIM_PKGVAR}/logs" 2>/dev/null
+exit 0

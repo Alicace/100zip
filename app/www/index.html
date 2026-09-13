@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>100解压</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <!-- 内联图标库（线性风格，离线可用） -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-logo" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="currentColor" opacity=".12"/><path d="M12 7v7m0 0l-3-3m3 3l3-3M7 17h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="i-archive" viewBox="0 0 24 24"><path d="M4 8l8-4 8 4v8l-8 4-8-4V8z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M12 12v8M4 8l8 4 8-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M13 3v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5-10-6.5z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 4L2.5 20h19L12 4z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M12 10v5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="17.4" r="1.1" fill="currentColor"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M12 3.5v2.4M12 18.1v2.4M4.9 7.8l2 1.2M17.1 15l2 1.2M4.9 16.2l2-1.2M17.1 9l2-1.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 13h8l1-13" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M16 16l4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-open" viewBox="0 0 24 24"><path d="M14 5h5v5M19 5l-8 8M10 5H6a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.2 5.2l1.5 1.5M17.3 17.3l1.5 1.5M5.2 18.8l1.5-1.5M17.3 6.7l1.5-1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5M20 4v4.5h-4.5M20 12a8 8 0 0 1-13.7 5.6L4 15.5M4 20v-4.5h4.5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 4H4v4M4 4l6 6M16 4h4v4M20 4l-6 6M8 20H4v-4M4 20l6-6M16 20h4v-4M20 20l-6-6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-extract" viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M15 14v5m0 0-2-2m2 2 2-2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-stack" viewBox="0 0 24 24"><path d="m12 4 8 4-8 4-8-4 8-4Zm-8 8 8 4 8-4M4 16l8 4 8-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-icon"><use href="#i-logo"></use></svg>
+      <div class="brand-text">
+        <span class="brand-name">100解压</span>
+        <span class="brand-ver" id="version"></span>
+      </div>
+    </div>
+    <nav class="tabs">
+      <button class="tab active" data-view="extract"><svg><use href="#i-extract"></use></svg><span>解压</span></button>
+      <button class="tab" data-view="compress"><svg><use href="#i-archive"></use></svg><span>压缩</span></button>
+      <button class="tab" data-view="batch"><svg><use href="#i-stack"></use></svg><span>批量</span></button>
+      <button class="tab" data-view="jobs"><svg><use href="#i-check"></use></svg><span>任务</span><span id="jobBadge" class="tab-badge" hidden></span></button>
+      <button class="tab" data-view="settings"><svg><use href="#i-gear"></use></svg><span>设置</span></button>
+    </nav>
+    <div class="top-actions">
+      <button id="btnTheme" class="icon-btn" title="切换主题" aria-label="切换主题">
+        <svg><use href="#i-moon"></use></svg>
+      </button>
+    </div>
+  </header>
+
+  <div id="globalBanner" class="banner warn" hidden>
+    <svg><use href="#i-warn"></use></svg>
+    <span id="globalBannerText"></span>
+    <button id="btnBannerGo" class="link">去处理</button>
+    <button id="btnBannerClose" class="icon-btn sm" aria-label="关闭"><svg><use href="#i-x"></use></svg></button>
+  </div>
+
+  <main>
+    <!-- 解压 -->
+    <section id="view-extract" class="view active">
+      <div id="authBanner" class="banner" hidden>
+        <svg><use href="#i-warn"></use></svg>
+        <span>尚未授权任何目录，无法读取或写入文件</span>
+        <button id="btnBannerAuth" class="link">点此授权</button>
+      </div>
+
+      <!-- 空状态引导 -->
+      <div id="extractEmpty" class="empty">
+        <svg class="empty-icon"><use href="#i-archive"></use></svg>
+        <h2>打开一个压缩包开始</h2>
+        <p>支持 40+ 格式、分卷包与中文文件名自动修复</p>
+        <div class="row center">
+          <button id="btnEmptyOpen" class="btn primary">
+            <svg><use href="#i-folder"></use></svg>打开压缩包
+          </button>
+          <button id="btnEmptyBatch" class="btn">
+            <svg><use href="#i-search"></use></svg>批量扫描
+          </button>
+        </div>
+        <div class="row center">
+          <input id="srcPathInput" type="text" class="sm-input" placeholder="或粘贴压缩包路径，例如 /vol2/1000/05_文件下载/movie.7z.001" />
+          <button id="btnOpenTyped" class="btn ghost">打开</button>
+        </div>
+      </div>
+
+      <!-- 工作区 -->
+      <div id="extractWork" hidden>
+        <div class="card info-card compact">
+          <div class="info-head">
+            <span class="badge format" id="pkgBadge">7Z</span>
+            <div class="info-title">
+              <h2 id="infoName">—</h2>
+              <p id="infoPath" class="path">—</p>
+            </div>
+            <dl class="metrics" id="infoMetrics"></dl>
+            <button id="btnPickArchive" class="btn sm" title="更换压缩包">
+              <svg><use href="#i-folder"></use></svg>更换
+            </button>
+            <button id="btnClearArchive" class="icon-btn sm" title="清除当前压缩包" aria-label="清除当前压缩包">
+              <svg><use href="#i-x"></use></svg>
+            </button>
+          </div>
+          <div class="alert" id="volumeAlert" hidden></div>
+          <p class="path" id="rootInfo"></p>
+        </div>
+
+        <!-- 解压选项：紧凑两行，置于列表上方 -->
+        <div class="card opts-card">
+          <div class="optline">
+            <span class="fl">解压到</span>
+            <input id="destPath" type="text" placeholder="输出目录，例如 /vol1/1000/media" />
+            <button id="btnPickDest" class="btn" title="选择目录" aria-label="选择目录"><svg><use href="#i-folder"></use></svg></button>
+            <label class="inline"><input id="createSubdir" type="checkbox" checked /> 同名子目录</label>
+            <label class="inline">同名
+              <select id="overwrite">
+                <option value="rename" selected>自动改名</option>
+                <option value="overwrite">覆盖</option>
+                <option value="skip">跳过</option>
+              </select>
+            </label>
+          </div>
+          <div class="optline">
+            <span class="fl">密码</span>
+            <input id="password" type="password" placeholder="压缩包密码（可选）" />
+            <select id="vaultSelect" class="w160"><option value="">（密码库…）</option></select>
+            <button id="btnVaultSave" class="icon-btn" title="保存当前密码到密码库" aria-label="保存到密码库">
+              <svg><use href="#i-lock"></use></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 包内文件（主体）+ 单击预览分栏 -->
+        <div class="card files-card" id="entriesCard">
+          <div class="row between">
+            <h3>包内文件 <span id="entryCount" class="muted"></span></h3>
+            <span class="muted">单击文件查看预览，双击放大</span>
+          </div>
+          <div class="searchbox">
+            <svg><use href="#i-search"></use></svg>
+            <input id="entryFilter" type="text" placeholder="搜索包内文件…" />
+            <button id="btnSelectAll" class="btn ghost sm">全选 / 反选</button>
+          </div>
+          <div class="with-preview" id="withPreview">
+            <div class="tree" id="entryList"></div>
+            <aside class="preview-pane" id="previewPane" hidden>
+              <div class="pane-head">
+                <strong id="paneTitle" class="ellipsis">预览</strong>
+                <button id="btnPaneClose" class="icon-btn sm" aria-label="关闭预览"><svg><use href="#i-x"></use></svg></button>
+              </div>
+              <div class="pane-body" id="paneBody"></div>
+              <p class="hint" id="paneHint"></p>
+            </aside>
+          </div>
+        </div>
+      </div>
+
+      <div class="actionbar" id="extractBar" hidden>
+        <span id="listHint" class="hint flex1"></span>
+        <label class="inline"><input id="fixEncoding" type="checkbox" checked /> 修复中文文件名</label>
+        <button id="btnList" class="btn" title="重新读取包内文件">
+          <svg><use href="#i-refresh"></use></svg>重新读取
+        </button>
+        <button id="btnExtract" class="btn primary">
+          <svg><use href="#i-play"></use></svg>开始解压
+        </button>
+      </div>
+      <input id="srcPath" type="hidden" />
+    </section>
+
+    <!-- 压缩 -->
+    <section id="view-compress" class="view">
+      <!-- 空状态：先选择要打包的内容 -->
+      <div id="compressEmpty" class="empty">
+        <svg class="empty-icon"><use href="#i-archive"></use></svg>
+        <h2>选择要打包的内容</h2>
+        <p>支持文件夹与多个文件；可选加密、分卷与压缩率</p>
+        <div class="row center">
+          <button id="btnEmptyFiles" class="btn primary"><svg><use href="#i-file"></use></svg>添加文件…</button>
+          <button id="btnEmptyDirs" class="btn"><svg><use href="#i-folder"></use></svg>添加文件夹…</button>
+        </div>
+      </div>
+
+      <div id="compressWork" hidden>
+      <div class="card">
+        <div class="row between">
+          <h3>来源 <span class="muted" id="srcCount"></span></h3>
+        </div>
+        <div class="src-list" id="srcList"></div>
+        <div class="row">
+          <button id="btnPickSrcFiles" class="btn">添加文件…</button>
+            <button id="btnPickSrcDir" class="btn">添加文件夹…</button>
+          <button id="btnClearSrc" class="btn ghost">清空</button>
+          <label class="inline ml-auto"><input id="compBatch" type="checkbox" /> 每个来源单独打包</label>
+        </div>
+      </div>
+      <div class="card">
+        <h3>格式与选项</h3>
+        <div class="opt-grid">
+          <div class="opt opt-wide">
+            <label>压缩文件名</label>
+            <input id="compName" type="text" placeholder="例如：我的资料（扩展名会随格式自动变更）" />
+            <p class="hint">只填写文件名即可，.zip / .7z 等扩展名会跟随上方格式自动更新。</p>
+          </div>
+          <div class="opt">
+            <label>格式</label>
+            <select id="compFormat">
+              <option value="7z">7z（推荐，支持加密+分卷）</option>
+              <option value="zip">zip（通用，支持加密+分卷）</option>
+              <option value="tar">tar（仅打包）</option>
+              <option value="gz">tar.gz</option>
+              <option value="bz2">tar.bz2</option>
+              <option value="xz">tar.xz</option>
+              <option value="tar.zst">tar.zst（zstd）</option>
+              <option value="tar.lz4">tar.lz4（lz4）</option>
+              <option value="tar.br">tar.br（brotli）</option>
+              <option value="zst">zst（单文件）</option>
+              <option value="lz4">lz4（单文件）</option>
+              <option value="br">brotli（单文件）</option>
+            </select>
+          </div>
+          <div class="opt">
+            <label>压缩率</label>
+            <select id="compLevel">
+              <option value="0">仅存储（最快）</option>
+              <option value="1">最快</option>
+              <option value="3">快速</option>
+              <option value="5" selected>标准</option>
+              <option value="7">强力</option>
+              <option value="9">最大压缩</option>
+            </select>
+          </div>
+          <div class="opt">
+            <label>压缩方法</label>
+            <select id="compMethod">
+              <option value="LZMA2" selected>LZMA2（推荐）</option>
+              <option value="LZMA">LZMA</option>
+              <option value="PPMd">PPMd（文本）</option>
+              <option value="Deflate">Deflate（兼容 ZIP）</option>
+            </select>
+          </div>
+          <div class="opt">
+            <label>字典大小</label>
+            <select id="compDict">
+              <option value="">自动</option>
+              <option value="16M">16 MB</option>
+              <option value="32M">32 MB</option>
+              <option value="64M">64 MB</option>
+              <option value="128M">128 MB</option>
+              <option value="256M">256 MB</option>
+            </select>
+          </div>
+          <div class="opt">
+            <label>分卷大小（可选）</label>
+            <div class="split-input">
+              <input id="compSplit" type="number" min="1" step="1" list="splitPresets" placeholder="自定义大小" />
+              <select id="compSplitUnit" aria-label="分卷单位">
+                <option value="M" selected>MB</option>
+                <option value="G">GB</option>
+                <option value="T">TB</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <datalist id="splitPresets">
+          <option value="30"></option>
+          <option value="100"></option>
+          <option value="700"></option>
+          <option value="2048"></option>
+          <option value="4096"></option>
+        </datalist>
+        <p class="hint" id="compSplitHint"></p>
+        <div class="row comp-checks">
+          <label class="inline"><input id="compSolid" type="checkbox" checked /> 固实压缩（7z）</label>
+          <label class="inline"><input id="compTest" type="checkbox" checked /> 完成后测试压缩包</label>
+          <label class="inline danger-text"><input id="compDeleteSource" type="checkbox" /> 成功后删除源文件</label>
+        </div>
+      </div>
+      <div class="card">
+        <h3>输出</h3>
+        <div class="row">
+          <input id="compDestDir" type="text" placeholder="选择输出目录" />
+          <button id="btnPickCompDest" class="btn" title="选择目录"><svg><use href="#i-folder"></use></svg></button>
+        </div>
+        <div class="row">
+          <input id="compPassword" type="password" placeholder="加密密码（可选，7z/zip 支持）" />
+          <label class="inline"><input id="compShowPassword" type="checkbox" /> 显示</label>
+        </div>
+        <div class="row" id="compPasswordConfirmRow" hidden>
+          <input id="compPasswordConfirm" type="password" placeholder="再次输入密码以确认" />
+        </div>
+        <p class="hint" id="compPasswordHint"></p>
+      </div>
+      <div class="actionbar">
+        <span class="hint flex1" id="compHint"></span>
+        <button id="btnCompress" class="btn primary">
+          <svg><use href="#i-archive"></use></svg>开始压缩
+        </button>
+      </div>
+      </div>
+    </section>
+
+    <!-- 任务 -->
+    <section id="view-jobs" class="view">
+      <div class="jobs-head">
+        <div class="jobs-filter" id="jobFilter">
+          <button class="chip active" data-filter="all">全部<span class="cnt" id="cntAll"></span></button>
+          <button class="chip" data-filter="active">进行中<span class="cnt" id="cntActive"></span></button>
+          <button class="chip" data-filter="waiting">等待密码<span class="cnt" id="cntWaiting"></span></button>
+          <button class="chip" data-filter="manual">手动<span class="cnt" id="cntManual"></span></button>
+          <button class="chip" data-filter="done">已完成<span class="cnt" id="cntDone"></span></button>
+          <button class="chip" data-filter="failed">失败<span class="cnt" id="cntFailed"></span></button>
+        </div>
+        <div class="row-gap ml-auto">
+          <button id="btnClearCurrent" class="btn ghost sm">清空全部</button>
+        </div>
+        <button id="btnRefresh" class="icon-btn" title="刷新" aria-label="刷新"><svg><use href="#i-refresh"></use></svg></button>
+      </div>
+      <div id="jobList" class="joblist"></div>
+      <div class="empty" id="jobEmpty" hidden>
+        <svg class="empty-icon"><use href="#i-check"></use></svg>
+        <h2>没有任务</h2>
+        <p>解压、压缩和批量任务都会显示在这里</p>
+      </div>
+    </section>
+
+    <!-- 批量 -->
+    <section id="view-batch" class="view">
+      <div class="card">
+        <h3>扫描目录</h3>
+        <div class="row">
+          <input id="scanPath" type="text" placeholder="例如 /vol2/1000/05_文件下载" />
+          <button id="btnPickScanDir" class="btn"><svg><use href="#i-folder"></use></svg></button>
+          <button id="btnScan" class="btn primary"><svg><use href="#i-search"></use></svg>扫描</button>
+        </div>
+        <div class="row">
+          <label class="inline"><input id="scanRecursive" type="checkbox" checked /> 递归扫描子目录</label>
+          <label class="inline"><input id="scanArchivesOnly" type="checkbox" checked /> 仅扫描压缩包</label>
+        </div>
+        <p class="hint" id="scanHint"></p>
+      </div>
+
+      <div class="card" id="scanResultCard" hidden>
+        <div class="row between">
+          <h3>扫描结果 <span class="muted" id="scanCount"></span></h3>
+          <button id="btnScanSelectAll" class="btn ghost sm">全选 / 反选</button>
+        </div>
+        <div class="tree" id="scanList"></div>
+        <div class="opt-grid">
+          <div class="opt">
+            <label>解压到</label>
+            <select id="batchMode">
+              <option value="here">压缩包所在文件夹</option>
+              <option value="subdir" selected>以包名新建子文件夹</option>
+              <option value="custom">指定目录</option>
+            </select>
+          </div>
+          <div class="opt">
+            <label>并发数</label>
+            <select id="batchConcurrent">
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="4">4</option>
+              <option value="8">8</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" id="batchCustomRow" hidden>
+          <input id="batchDest" type="text" placeholder="指定目录（仅“指定目录”模式需要）" />
+          <button id="btnPickBatchDest" class="btn"><svg><use href="#i-folder"></use></svg></button>
+        </div>
+        <div class="row">
+          <label class="inline"><input id="batchTryVault" type="checkbox" checked /> 自动尝试密码库</label>
+          <label class="inline danger-text"><input id="batchAutoDelete" type="checkbox" /> 解压成功后删除源包</label>
+          <button id="btnBatchExtract" class="btn primary ml-auto">
+            <svg><use href="#i-play"></use></svg>开始批量解压
+          </button>
+        </div>
+        <p class="hint" id="batchHint"></p>
+      </div>
+    </section>
+
+    <!-- 设置 -->
+    <section id="view-settings" class="view">
+      <div class="card">
+        <h3>常规</h3>
+        <div class="opt-grid">
+          <div class="opt">
+            <label>主题</label>
+            <select id="setTheme">
+              <option value="light" selected>浅色</option>
+              <option value="dark">深色</option>
+            </select>
+          </div>
+          <div class="opt">
+            <label>最大并发任务</label>
+            <select id="setConcurrent">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <button id="btnSavePrefs" class="btn primary">保存设置</button>
+          <button id="btnDiagnostics" class="btn ghost">下载诊断报告</button>
+          <button id="btnCheckUpdate" class="btn ghost">检查更新</button>
+        </div>
+        <p class="hint" id="settingsHint"></p>
+        <p class="hint" id="updateHint"></p>
+      </div>
+      <div class="card">
+        <h3>密码库</h3>
+        <div class="row">
+          <select id="vaultListSet"></select>
+          <input id="vaultPlaintext" class="vault-plaintext" type="text" readonly placeholder="选择密码后点击显示" />
+          <button id="btnVaultReveal" class="btn ghost">显示</button>
+          <button id="btnVaultDelete2" class="btn ghost">删除所选</button>
+        </div>
+        <p class="hint">100解压是一款面向飞牛 NAS 的本地压缩与解压工具。支持多种压缩格式、分卷、密码、批量任务、包内预览和中文文件名处理。所有任务在 NAS 本地执行，密码使用 AES-256-GCM 加密保存，不上传到第三方服务。</p>
+      </div>
+      <div class="card">
+        <h3>关于</h3>
+        <p class="hint" id="aboutInfo"></p>
+        <p class="hint">支持 7z、ZIP、RAR、TAR 及常见压缩格式；支持批量解压、批量压缩、分卷、密码和任务队列。图片、文本、PDF 可直接预览，DOCX/XLSX/PPTX 提供文字预览。音视频播放能力取决于浏览器编码支持。应用为第三方开源项目，与飞牛官方无隶属关系。</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" hidden>
+    <span id="toastText"></span>
+    <button id="toastAction" class="link" hidden></button>
+    <button class="icon-btn sm" id="toastClose" aria-label="关闭"><svg><use href="#i-x"></use></svg></button>
+  </div>
+
+  <!-- 包内预览 -->
+  <div id="previewModal" class="dialog" hidden>
+    <div class="dialog-card lg">
+      <div class="dialog-head">
+        <h3 id="previewTitle">预览</h3>
+        <span class="row-gap">
+          <button id="btnPreviewFullscreen" class="icon-btn" title="全屏预览" aria-label="全屏预览"><svg><use href="#i-expand"></use></svg></button>
+          <button id="btnPreviewClose" class="icon-btn" aria-label="关闭"><svg><use href="#i-x"></use></svg></button>
+        </span>
+      </div>
+      <div class="dialog-body preview-body" id="previewBody"></div>
+      <p class="hint" id="previewHint"></p>
+    </div>
+  </div>
+
+  <!-- 密码输入（等待密码 / 手动任务续跑） -->
+  <div id="passwordModal" class="dialog" hidden>
+    <div class="dialog-card sm">
+      <div class="dialog-head">
+        <h3 id="pwTitle">输入密码</h3>
+        <button id="btnPwClose" class="icon-btn" aria-label="关闭"><svg><use href="#i-x"></use></svg></button>
+      </div>
+      <p class="muted" id="pwSub"></p>
+      <label>密码</label>
+      <input id="pwInput" type="password" autocomplete="off" />
+      <label class="inline"><input id="pwSave" type="checkbox" /> 保存到密码库</label>
+      <input id="pwLabel" type="text" placeholder="密码库名称（可选，默认用文件名）" hidden />
+      <div class="dialog-actions">
+        <button id="btnPwDefer" class="btn ghost">稍后</button>
+        <button id="btnPwResume" class="btn primary">
+          <svg><use href="#i-play"></use></svg>继续解压
+        </button>
+      </div>
+      <p class="hint" id="pwHint"></p>
+    </div>
+  </div>
+
+  <!-- 来源浏览（压缩页：目录内单选/多选） -->
+  <div id="browseModal" class="dialog" hidden>
+    <div class="dialog-card lg">
+      <div class="dialog-head">
+        <h3>添加文件夹</h3>
+        <button id="btnBrowseClose" class="icon-btn" aria-label="关闭"><svg><use href="#i-x"></use></svg></button>
+      </div>
+      <div class="row">
+        <input id="browsePath" type="text" placeholder="文件夹路径，例如 /vol1/1000/media（可展开选择内部内容）" />
+        <button id="btnBrowseLoad" class="btn primary">载入</button>
+      </div>
+      <div class="row between">
+        <span class="muted" id="browseCount"></span>
+        <button id="btnBrowseSelectAll" class="btn ghost sm">全选 / 反选</button>
+      </div>
+      <div class="tree browse-list" id="browseList"></div>
+      <p class="hint" id="browseHint"></p>
+      <div class="dialog-actions right">
+        <button id="btnBrowseAdd" class="btn primary">加入来源</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 确认（替代原生 confirm） -->
+  <div id="confirmModal" class="dialog" hidden>
+    <div class="dialog-card sm">
+      <div class="dialog-head"><h3 id="cfTitle">确认</h3></div>
+      <p id="cfText" class="prewrap"></p>
+      <div class="dialog-actions right">
+        <button id="btnCfCancel" class="btn ghost">取消</button>
+        <button id="btnCfOk" class="btn danger">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 首次使用授权引导 -->
+  <div id="authGate" class="dialog" hidden>
+    <div class="dialog-card sm">
+      <div class="dialog-head"><h3>先授权一个目录</h3></div>
+      <p>100解压 需要你指定一个可访问的文件夹，才能读取里面的压缩包、并把解压结果写进去。</p>
+      <p class="muted">权限由飞牛系统控制：授权后，应用只能访问你选择的目录（可随时在应用设置里撤销）。</p>
+      <div class="dialog-actions wrap">
+        <button id="btnGateAuth" class="btn primary">选择目录并授权</button>
+        <button id="btnGateSettings" class="btn ghost">如何手动授权？</button>
+        <button id="btnGateRefresh" class="btn ghost">我已授权，刷新</button>
+        <button id="btnGateLater" class="btn ghost">稍后</button>
+      </div>
+      <div id="gateHelp" hidden>
+        <p class="hint">
+          手动授权步骤（共 8 步）：<br />
+          1. 打开「<b>应用中心</b>」；<br />
+          2. 点击左侧「<b>已安装</b>」；<br />
+          3. 点击「<b>100解压</b>」；<br />
+          4. 点击「<b>应用设置</b>」；<br />
+          5. 点击「<b>访问权限</b>」标签；<br />
+          6. 打开「允许普通用户授权应用访问其文件和文件夹」，点击「<b>+ 添加</b>」；<br />
+          7. 选择要允许的文件夹，权限选「<b>读写</b>」；<br />
+          8. 回到本页，点击「<b>我已授权，刷新</b>」。
+        </p>
+      </div>
+      <p class="hint" id="gateHint"></p>
+    </div>
+  </div>
+
+  <script type="module" src="js/fnos-bridge.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
