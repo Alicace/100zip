@@ -89,7 +89,14 @@ p { margin: 6px 0; }
 .brand-icon { width: 30px; height: 30px; color: var(--accent); }
 .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
 .brand-name { font-weight: 700; font-size: 15px; letter-spacing: 0; }
+.brand-meta { display: inline-flex; align-items: center; gap: 6px; min-height: 18px; }
 .brand-ver { font-size: 11px; color: var(--muted); }
+.version-update {
+  border: 0; border-radius: 999px; padding: 2px 7px; cursor: pointer;
+  background: var(--success-soft); color: var(--success); font: inherit;
+  font-size: 10px; font-weight: 750; line-height: 16px;
+}
+.version-update:hover { filter: brightness(.96); }
 .tabs { display: flex; gap: 4px; margin: 0 auto; }
 .tab {
   position: relative;
@@ -139,6 +146,18 @@ main { max-width: 1080px; margin: 0 auto; padding: 16px 18px 96px; }
   padding: 16px; margin-bottom: 14px;
 }
 .card h3 { margin-bottom: 10px; }
+.about-head { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.about-identity { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.about-icon { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 14px; color: var(--accent-dark); background: var(--accent-soft); }
+.about-icon svg { width: 28px; height: 28px; }
+.about-name { font-size: 20px; letter-spacing: -.02em; margin: 0 0 2px; }
+.about-version-line { display: flex; align-items: center; gap: 8px; }
+.about-version { color: var(--muted); font-size: 13px; font-weight: 650; }
+.about-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.about-status { margin-top: 14px; padding: 10px 12px; border-radius: var(--r-ctl); background: var(--surface-soft); }
+.about-status.update-available { color: var(--success); background: var(--success-soft); }
+.about-status.update-error { color: var(--warning); background: var(--warning-soft); }
+.about-copy { line-height: 1.7; }
 
 /* ---------------- 空状态 ---------------- */
 .empty {
@@ -501,6 +520,9 @@ body.dark .toast { background: #2c333c; color: #e7e9ee; border: 1px solid var(--
 }
 
 @media (max-width: 520px) {
+  .about-head { align-items: flex-start; flex-direction: column; }
+  .about-actions { width: 100%; justify-content: flex-start; }
+  .about-actions .btn { flex: 1 1 140px; }
   .dialog { padding: 8px; }
   .dialog-card.lg { max-width: 100%; max-height: calc(100vh - 16px); padding: 12px; }
   .preview-body { min-height: 55vh; max-height: calc(100vh - 110px); }

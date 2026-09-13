@@ -16,6 +16,79 @@ const APP_BASE = (() => {
   return m ? m[1] : "";
 })();
 
+let currentVersion = "dev";
+let latestRelease = null;
+
+function normalizeVersion(value) {
+  const m = String(value == null ? "" : value).trim().replace(/^v/i, "").match(/^(\d+(?:\.\d+){0,3})/);
+  return m ? m[1].split(".").map((n) => Number(n || 0)) : [];
+}
+
+function compareVersions(a, b) {
+  const av = normalizeVersion(a), bv = normalizeVersion(b);
+  if (!av.length || !bv.length) return 0;
+  for (let i = 0; i < Math.max(av.length, bv.length); i++) {
+    const x = av[i] || 0, y = bv[i] || 0;
+    if (x !== y) return x > y ? 1 : -1;
+  }
+  return 0;
+}
+
+function openLatestRelease() {
+  const url = latestRelease?.url || "https://github.com/Alicace/100zip/releases";
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function renderUpdateState(state, message = "") {
+  const top = $("topUpdateButton");
+  const about = $("btnOpenUpdate");
+  const hint = $("updateHint");
+  if (!top || !about || !hint) return;
+  top.hidden = state !== "available";
+  about.hidden = state !== "available";
+  hint.classList.toggle("update-available", state === "available");
+  hint.classList.toggle("update-error", state === "error");
+  hint.textContent = message || (state === "available" ? `发现新版本 v${latestRelease.version}，点击按钮前往 GitHub 下载。` : "启动时会自动检查 GitHub 最新版本。");
+  if (state === "available") {
+    top.textContent = `升级 v${latestRelease.version}`;
+    top.title = `发现新版本 v${latestRelease.version}`;
+    about.textContent = `升级到 v${latestRelease.version}`;
+  }
+}
+
+async function checkForUpdates({ silent = false } = {}) {
+  const hint = $("updateHint");
+  const check = $("btnCheckUpdate");
+  if (!hint || !check) return false;
+  check.disabled = true;
+  if (!silent) hint.textContent = "正在检查最新版本…";
+  try {
+    const res = await fetch("https://api.github.com/repos/Alicace/100zip/releases/latest", {
+      headers: { Accept: "application/vnd.github+json" },
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error("暂时无法连接更新服务");
+    const rel = await res.json();
+    const latest = String(rel.tag_name || rel.name || "").replace(/^v/i, "").trim();
+    if (!normalizeVersion(latest).length) throw new Error("GitHub 未返回有效版本号");
+    latestRelease = { version: latest, url: rel.html_url || "https://github.com/Alicace/100zip/releases", publishedAt: rel.published_at || "" };
+    const newer = compareVersions(latest, currentVersion) > 0;
+    if (newer) {
+      renderUpdateState("available");
+    } else {
+      latestRelease = null;
+      renderUpdateState("current", `当前已是最新版本 v${currentVersion || latest}。`);
+    }
+    return newer;
+  } catch (e) {
+    if (!silent) renderUpdateState("error", e.message + "。可稍后重试。");
+    return false;
+  } finally {
+    check.disabled = false;
+    check.textContent = "检查更新";
+  }
+}
+
 async function api(path, options = {}) {
   const res = await fetch(APP_BASE + path, {
     headers: { "Content-Type": "application/json" },
@@ -1185,7 +1258,12 @@ setInterval(() => {
   }
   try {
     const caps = await api("/api/capabilities");
-    $("version").textContent = "v" + (caps.appVersion || "dev");
+    currentVersion = String(caps.appVersion || "dev");
+    $("version").textContent = "v" + currentVersion;
+    $("aboutVersion").textContent = "v" + currentVersion;
+    $("aboutPlatform").textContent = caps.platform || "x86_64";
+    $("aboutInfo").textContent = `飞牛 NAS 本地运行 · ${caps.cpuCores || "—"} 个 CPU 核心 · 任务与密码数据保存在本机`;
+    await checkForUpdates({ silent: true });
   } catch { /* 忽略 */ }
   refreshJobs();
   updateClearButton();
@@ -1494,32 +1572,19 @@ $("btnDiagnostics").addEventListener("click", async () => {
 });
 
 // 更新检查只读取 GitHub Releases 元数据，不上传用户文件、密码或诊断日志。
-$("btnCheckUpdate").addEventListener("click", async () => {
-  const hint = $("updateHint");
-  hint.textContent = "正在检查最新版本…";
-  try {
-    const res = await fetch("https://api.github.com/repos/Alicace/100zip/releases/latest", {
-      headers: { Accept: "application/vnd.github+json" },
-    });
-    if (!res.ok) throw new Error("暂时无法连接更新服务");
-    const rel = await res.json();
-    const latest = String(rel.tag_name || rel.name || "").replace(/^v/i, "");
-    const current = String($("version").textContent || "").replace(/^v/i, "");
-    const newer = latest && latest.localeCompare(current, undefined, { numeric: true }) > 0;
-    const asset = (rel.assets || []).find((a) => /100zip_.*_x86_64\.fpk$/i.test(a.name));
-    hint.innerHTML = newer
-      ? `发现新版本 v${escapeHtml(latest)}：<a href="${escapeHtml(asset?.browser_download_url || rel.html_url || "#")}" target="_blank" rel="noopener">查看下载</a>`
-      : `当前已是最新版本（v${escapeHtml(current || latest || "未知")}）。`;
-  } catch (e) {
-    hint.textContent = e.message + "。也可以直接查看项目 Releases 页面。";
-  }
-});
+$("btnCheckUpdate").addEventListener("click", () => checkForUpdates());
+$("topUpdateButton").addEventListener("click", openLatestRelease);
+$("btnOpenUpdate").addEventListener("click", openLatestRelease);
 
 // 启动时加载密码库/偏好，并填充关于信息
 loadVault();
 loadPrefs();
 api("/api/capabilities").then((c) => {
-    $("aboutInfo").textContent = `100解压 v${c.appVersion || "dev"} · 飞牛 NAS 本地运行 · 任务与密码数据保存在本机`;
+    currentVersion = String(c.appVersion || currentVersion || "dev");
+    $("version").textContent = "v" + currentVersion;
+    $("aboutVersion").textContent = "v" + currentVersion;
+    $("aboutPlatform").textContent = c.platform || "x86_64";
+    $("aboutInfo").textContent = `飞牛 NAS 本地运行 · ${c.cpuCores || "—"} 个 CPU 核心 · 任务与密码数据保存在本机`;
 }).catch(() => {});
 
 // ---------------- 批量扫描与解压

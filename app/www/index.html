@@ -35,7 +35,7 @@
       <svg class="brand-icon"><use href="#i-logo"></use></svg>
       <div class="brand-text">
         <span class="brand-name">100解压</span>
-        <span class="brand-ver" id="version"></span>
+        <span class="brand-meta"><span class="brand-ver" id="version"></span><button id="topUpdateButton" class="version-update" hidden>升级</button></span>
       </div>
     </div>
     <nav class="tabs">
@@ -408,10 +408,8 @@
         <div class="row">
           <button id="btnSavePrefs" class="btn primary">保存设置</button>
           <button id="btnDiagnostics" class="btn ghost">下载诊断报告</button>
-          <button id="btnCheckUpdate" class="btn ghost">检查更新</button>
         </div>
         <p class="hint" id="settingsHint"></p>
-        <p class="hint" id="updateHint"></p>
       </div>
       <div class="card">
         <h3>密码库</h3>
@@ -424,9 +422,22 @@
         <p class="hint">100解压是一款面向飞牛 NAS 的本地压缩与解压工具。支持多种压缩格式、分卷、密码、批量任务、包内预览和中文文件名处理。所有任务在 NAS 本地执行，密码使用 AES-256-GCM 加密保存，不上传到第三方服务。</p>
       </div>
       <div class="card">
-        <h3>关于</h3>
-        <p class="hint" id="aboutInfo"></p>
-        <p class="hint">支持 7z、ZIP、RAR、TAR 及常见压缩格式；支持批量解压、批量压缩、分卷、密码和任务队列。图片、文本、PDF 可直接预览，DOCX/XLSX/PPTX 提供文字预览。音视频播放能力取决于浏览器编码支持。应用为第三方开源项目，与飞牛官方无隶属关系。</p>
+        <div class="about-head">
+          <div class="about-identity">
+            <div class="about-icon"><svg><use href="#i-logo"></use></svg></div>
+            <div>
+              <h3 id="aboutName" class="about-name">100解压</h3>
+              <div class="about-version-line"><span id="aboutVersion" class="about-version">v—</span><span id="aboutPlatform" class="badge format">x86_64</span></div>
+            </div>
+          </div>
+          <div class="about-actions">
+            <button id="btnCheckUpdate" class="btn ghost">检查更新</button>
+            <button id="btnOpenUpdate" class="btn primary" hidden>升级到新版本</button>
+          </div>
+        </div>
+        <p class="hint about-status" id="updateHint">启动时会自动检查 GitHub 最新版本。</p>
+        <p class="hint" id="aboutInfo">飞牛 NAS 本地运行 · 任务与密码数据保存在本机</p>
+        <p class="hint about-copy">支持 7z、ZIP、RAR、TAR 及常见压缩格式；支持批量解压、批量压缩、分卷、密码和任务队列。图片、文本、PDF 可直接预览，DOCX/XLSX/PPTX 提供文字预览。音视频播放能力取决于浏览器编码支持。应用为第三方开源项目，与飞牛官方无隶属关系。</p>
       </div>
     </section>
   </main>
