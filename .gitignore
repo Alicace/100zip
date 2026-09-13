@@ -3,6 +3,7 @@
 /dist/
 /app/bin/
 /tmp/
+/docs/
 
 # 本地缓存（引擎归档与解包）
 /refs/vendor/_extract/
