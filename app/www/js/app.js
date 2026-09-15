@@ -1330,6 +1330,8 @@ setInterval(() => {
   syncCompExt();
   syncSplitHint();
   syncCompressionAdvanced();
+  syncTimestampOptions();
+  if ($("compAutoTimestamp").checked && !$("compName").value.trim()) await syncTimestampedName();
   // 处理授权回调带回的目录（callback.html → sessionStorage → 在此登记）
   if (window.fnosBridge) {
     const pending = window.fnosBridge.takePendingPaths();
