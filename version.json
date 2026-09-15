@@ -1,6 +1,6 @@
 {
-  "version": "0.5.19",
-  "release_url": "https://github.com/Alicace/100zip/releases/tag/v0.5.19",
+  "version": "0.5.20",
+  "release_url": "https://github.com/Alicace/100zip/releases/tag/v0.5.20",
   "published_at": "2026-09-15",
-  "release_notes": "时间选项移至文件名旁；支持任务1自动命名，并使用NAS本地时间生成日期或日期时间戳。"
+  "release_notes": "全局 UI 视觉优化；时间选项使用年-月-日等泛化格式提示；时间戳继续使用 NAS 本地时间。"
 }

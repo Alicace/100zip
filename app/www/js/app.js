@@ -837,7 +837,7 @@ function syncTimestampOptions() {
   $("compTimestampFormat").disabled = !enabled;
   $("compTimestampHint").classList.remove("error");
   $("compTimestampHint").textContent = enabled
-    ? `使用 NAS 本地时间自动追加${$("compTimestampFormat").value === "date" ? "日期" : "日期和时间"}，例如：任务1-${$("compTimestampFormat").value === "date" ? "2026-09-15" : "2026-09-15-14-30-00"}${currentExt()}`
+    ? `使用 NAS 本地时间自动追加${$("compTimestampFormat").value === "date" ? "日期（年-月-日）" : "日期+时间（年-月-日-时-分-秒）"}，格式示例：任务1-年-月-日${$("compTimestampFormat").value === "date" ? "" : "-时-分-秒"}${currentExt()}`
     : "勾选后会在文件名扩展名前自动添加 NAS 本地时间。";
 }
 let timestampSyncToken = 0;

@@ -5,13 +5,13 @@
    ============================================================ */
 
 :root {
-  --bg: #f3f5f7;
+  --bg: #f1f5f9;
   --surface: #ffffff;
-  --surface-soft: #f7f9fa;
+  --surface-soft: #f7faff;
   --ink: #1d282c;
   --muted: #68777d;
-  --line: #dfe4e8;
-  --line-strong: #c4cfd2;
+  --line: #dbe4ec;
+  --line-strong: #b9c9d6;
   --accent: #2786dc;
   --accent-dark: #1d6fb8;
   --accent-soft: #eaf4fd;
@@ -21,9 +21,9 @@
   --warning-soft: #fff7e7;
   --danger: #b42318;
   --danger-soft: #fff0ed;
-  --shadow-card: 0 1px 3px rgba(31, 48, 55, 0.07), 0 1px 2px rgba(31, 48, 55, 0.05);
-  --shadow-pop: 0 12px 34px rgba(31, 48, 55, 0.16);
-  --r-card: 10px;
+  --shadow-card: 0 2px 8px rgba(31, 48, 55, 0.06), 0 1px 2px rgba(31, 48, 55, 0.04);
+  --shadow-pop: 0 16px 42px rgba(31, 48, 55, 0.18);
+  --r-card: 12px;
   --r-ctl: 8px;
   --h-ctl: 36px;
   --font: system-ui, "Segoe UI", "Microsoft YaHei", sans-serif;
@@ -57,7 +57,10 @@ html { height: 100%; }
 body {
   margin: 0; min-height: 100%;
   overflow-x: hidden;
-  background: var(--bg); color: var(--ink);
+  background:
+    radial-gradient(circle at 8% -10%, rgba(64, 147, 224, .10), transparent 34%),
+    radial-gradient(circle at 100% 0%, rgba(122, 191, 244, .08), transparent 30%),
+    var(--bg); color: var(--ink);
   font: 14px/1.55 var(--font);
   -webkit-font-smoothing: antialiased;
 }
@@ -83,8 +86,10 @@ p { margin: 6px 0; }
   position: sticky; top: 0; z-index: 20;
   display: flex; align-items: center; gap: 16px;
   height: 56px; padding: 0 18px;
-  background: var(--surface); border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,251,254,.96));
+  border-bottom: 1px solid var(--line); box-shadow: 0 2px 12px rgba(41, 79, 105, .06);
 }
+body.dark .topbar { background: var(--surface); box-shadow: none; }
 .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .brand-icon { width: 30px; height: 30px; color: var(--accent); }
 .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
@@ -108,7 +113,8 @@ p { margin: 6px 0; }
 }
 .tab svg { width: 17px; height: 17px; stroke-width: 1.8; }
 .tab:hover { color: var(--ink); background: var(--surface-soft); }
-.tab.active { color: var(--accent-dark); background: var(--accent-soft); font-weight: 750; box-shadow: inset 0 -2px 0 var(--accent); }
+.tab.active { color: var(--accent-dark); background: linear-gradient(180deg, #eef7ff, var(--accent-soft)); font-weight: 750; box-shadow: inset 0 -2px 0 var(--accent), 0 2px 7px rgba(39, 134, 220, .10); }
+body.dark .tab.active { background: var(--accent-soft); box-shadow: inset 0 -2px 0 var(--accent); }
 .tab-badge {
   display: inline-block; margin-left: 6px; padding: 0 6px; min-width: 18px;
   border-radius: 9px; background: var(--danger); color: #fff;
@@ -141,11 +147,12 @@ main { max-width: 1080px; margin: 0 auto; padding: 16px 18px 96px; }
 .view { display: none; }
 .view.active { display: block; animation: fadein .18s ease; }
 .card {
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card);
+  background: linear-gradient(145deg, var(--surface), rgba(250,252,255,.96)); border: 1px solid var(--line); border-radius: var(--r-card);
   box-shadow: var(--shadow-card);
-  padding: 16px; margin-bottom: 14px;
+  padding: 17px; margin-bottom: 14px;
 }
-.card h3 { margin-bottom: 10px; }
+body.dark .card { background: var(--surface); }
+.card h3 { margin-bottom: 12px; letter-spacing: -.01em; }
 .about-head { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
 .about-identity { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .about-icon { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 14px; color: var(--accent-dark); background: var(--accent-soft); }
@@ -161,9 +168,9 @@ main { max-width: 1080px; margin: 0 auto; padding: 16px 18px 96px; }
 
 /* ---------------- 空状态 ---------------- */
 .empty {
-  text-align: center; padding: 64px 20px 40px;
+  text-align: center; padding: 68px 20px 44px;
   background: var(--surface); border: 1px dashed var(--line-strong); border-radius: var(--r-card);
-  margin-bottom: 14px;
+  margin-bottom: 14px; background: linear-gradient(145deg, var(--surface), var(--accent-soft));
 }
 .empty-icon { width: 44px; height: 44px; color: var(--line-strong); }
 .empty h2 { margin: 12px 0 2px; font-size: 17px; }
@@ -181,6 +188,7 @@ main { max-width: 1080px; margin: 0 auto; padding: 16px 18px 96px; }
 .compression-options-card {
   background: linear-gradient(135deg, var(--surface) 0%, var(--accent-soft) 155%);
 }
+body.dark .compression-options-card { background: var(--surface); }
 .name-timestamp-row { display: flex; align-items: stretch; gap: 10px; }
 .name-input-wrap { flex: 1 1 360px; min-width: 220px; }
 .timestamp-inline {
@@ -191,12 +199,13 @@ main { max-width: 1080px; margin: 0 auto; padding: 16px 18px 96px; }
 .timestamp-inline select { width: auto; min-width: 210px; min-height: 32px; padding-top: 4px; padding-bottom: 4px; }
 .timestamp-inline:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .timestamp-inline select:disabled { opacity: .55; }
+body.dark .timestamp-inline { background: var(--surface-soft); }
 .split-input { display: flex; gap: 6px; }
 .split-input input { flex: 1; min-width: 0; }
 .split-input select { width: 78px; }
 .comp-checks { flex-wrap: wrap; margin-top: 10px; }
 .opt { display: flex; flex-direction: column; gap: 6px; }
-label { display: block; color: var(--muted); font-size: 12px; margin: 10px 0 4px; }
+label { display: block; color: var(--muted); font-size: 12px; font-weight: 600; margin: 10px 0 4px; }
 label.inline { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 13px; color: var(--ink); }
 input[type=text], input[type=password], textarea, select {
   width: 100%; min-height: var(--h-ctl);
@@ -225,13 +234,13 @@ input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--accent); }
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   min-height: var(--h-ctl); padding: 0 14px;
   background: var(--surface); color: var(--ink);
-  border: 1px solid var(--line); border-radius: var(--r-ctl);
+  border: 1px solid var(--line); border-radius: 10px;
   font: inherit; font-size: 14px; cursor: pointer; white-space: nowrap;
   transition: background .15s ease, border-color .15s ease, transform .05s ease;
 }
 .btn:hover { background: var(--surface-soft); border-color: var(--line-strong); }
 .btn:active { transform: translateY(1px); }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary { background: linear-gradient(135deg, #3d91df, var(--accent)); border-color: var(--accent); color: #fff; box-shadow: 0 3px 8px rgba(39, 134, 220, .16); }
 .btn.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
 .btn.danger { background: var(--danger); border-color: var(--danger); color: #fff; }
 .btn.danger:hover { filter: brightness(.94); }
@@ -382,9 +391,10 @@ body.dark .tree .item.selected { background: var(--surface-soft); }
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   margin: 14px 0 0;
   padding: 12px 14px;
-  background: var(--surface); border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--surface), var(--accent-soft)); border: 1px solid var(--line);
   border-radius: var(--r-card); box-shadow: var(--shadow-card);
 }
+body.dark .actionbar { background: var(--surface); }
 
 /* ---------------- 任务中心 ---------------- */
 .jobs-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
@@ -402,9 +412,10 @@ body.dark .chip.active { color: var(--accent); }
 .chip .cnt { font-size: 11px; opacity: .75; }
 .joblist { display: flex; flex-direction: column; gap: 10px; }
 .job-card {
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card);
+  background: linear-gradient(145deg, var(--surface), var(--surface-soft)); border: 1px solid var(--line); border-radius: var(--r-card);
   box-shadow: var(--shadow-card); padding: 10px 12px;
 }
+body.dark .job-card { background: var(--surface); }
 .job-row { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
 .job-icon {
   width: 36px; height: 36px; border-radius: 9px; flex: none;
