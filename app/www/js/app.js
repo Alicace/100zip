@@ -739,16 +739,32 @@ const EXT_MAP = {
   "zst": ".zst", "lz4": ".lz4", "br": ".br",
 };
 function currentExt() { return EXT_MAP[$("compFormat").value] || ".7z"; }
+function compressionTimestamp() {
+  if (!( $("compAutoTimestamp") && $("compAutoTimestamp").checked )) return "";
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  const date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  return $("compTimestampFormat").value === "date"
+    ? date
+    : `${date}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+}
+function archiveBaseName(name) {
+  return String(name || "").replace(/\.(7z|zip|tar|tar\.gz|tar\.bz2|tar\.xz|gz|bz2|xz|zst|lz4|br)$/i, "");
+}
+function addCompressionTimestamp(name, stamp) {
+  const base = archiveBaseName(name).replace(/_(\d{4}-\d{2}-\d{2})(?:_\d{2}-\d{2}-\d{2})?$/, "");
+  return stamp ? `${base}_${stamp}` : base;
+}
 function syncCompExt() {
   const cur = $("compName").value.trim();
   if (!cur) return;
-  $("compName").value = cur.replace(/\.(7z|zip|tar|tar\.gz|tar\.bz2|tar\.xz|gz|bz2|xz|zst|lz4|br)$/i, "") + currentExt();
+  $("compName").value = archiveBaseName(cur) + currentExt();
 }
-function compDestination() {
+function compDestination(stamp = "") {
   const dir = $("compDestDir").value.trim().replace(/\/+$/, "") || "/";
   let name = $("compName").value.trim();
-  if (!name) name = "archive" + currentExt();
-  else name = name.replace(/\.(7z|zip|tar|tar\.gz|tar\.bz2|tar\.xz|gz|bz2|xz|zst|lz4|br)$/i, "") + currentExt();
+  if (!name) name = "archive";
+  name = addCompressionTimestamp(name, stamp) + currentExt();
   return dir + "/" + name.replace(/^\/+/, "");
 }
 // 分卷提示随格式联动：仅 7z/zip 支持分卷
@@ -782,8 +798,18 @@ function compressionMethodValue() {
 $("compFormat").addEventListener("change", () => { syncCompExt(); syncSplitHint(); syncCompressionAdvanced(); });
 $("compSplit").addEventListener("input", syncSplitHint);
 $("compSplitUnit").addEventListener("change", syncSplitHint);
+function syncTimestampOptions() {
+  const enabled = $("compAutoTimestamp").checked;
+  $("compTimestampFormat").disabled = !enabled;
+  $("compTimestampHint").textContent = enabled
+    ? `任务开始时自动添加${$("compTimestampFormat").value === "date" ? "日期" : "日期和时间"}，例如：我的资料_${$("compTimestampFormat").value === "date" ? "2026-09-15" : "2026-09-15_14-30-00"}${currentExt()}`
+    : "开启后会在文件名扩展名前自动添加时间戳。";
+}
+$("compAutoTimestamp").addEventListener("change", syncTimestampOptions);
+$("compTimestampFormat").addEventListener("change", syncTimestampOptions);
 syncSplitHint();
 syncCompressionAdvanced();
+syncTimestampOptions();
 
 $("compShowPassword").addEventListener("change", (e) => {
   $("compPassword").type = e.target.checked ? "text" : "password";
@@ -797,7 +823,8 @@ $("compPassword").addEventListener("input", () => {
 
 $("btnCompress").addEventListener("click", async () => {
   const sources = [...srcItems];
-  const dest = compDestination();
+  const taskTimestamp = compressionTimestamp();
+  const dest = compDestination(taskTimestamp);
   if (!sources.length || !dest) return toast("请填写来源与输出文件", true);
   const password = $("compPassword").value;
   if (password && password !== $("compPasswordConfirm").value) {
@@ -835,9 +862,11 @@ $("btnCompress").addEventListener("click", async () => {
       let n = 0;
       for (const s of sources) {
         const rawBase = s.replace(/\/+$/, "").split("/").pop() || "archive";
-        let base = rawBase;
+        let base = taskTimestamp ? addCompressionTimestamp(rawBase, taskTimestamp) : rawBase;
         let serial = 2;
-        while (usedNames.has(base.toLowerCase())) base = rawBase + " (" + serial++ + ")";
+        while (usedNames.has(base.toLowerCase())) {
+          base = taskTimestamp ? addCompressionTimestamp(rawBase + " (" + serial++ + ")", taskTimestamp) : rawBase + " (" + serial++ + ")";
+        }
         usedNames.add(base.toLowerCase());
         await api("/api/archive/compress", {
           method: "POST",
@@ -1286,6 +1315,8 @@ function saveUIState() {
       compName: $("compName").value,
       srcItems: srcItems,
       format: $("compFormat").value,
+      autoTimestamp: $("compAutoTimestamp").checked,
+      timestampFormat: $("compTimestampFormat").value,
     }));
   } catch (e) { /* 忽略 */ }
 }
@@ -1303,9 +1334,11 @@ function restoreUIState() {
     if (Array.isArray(s.srcItems)) srcItems = s.srcItems.filter((x) => typeof x === "string");
     else if (s.compSources) srcItems = String(s.compSources).split("\n").map((x) => x.trim()).filter(Boolean);
     if (s.format) $("compFormat").value = s.format;
+    if (typeof s.autoTimestamp === "boolean") $("compAutoTimestamp").checked = s.autoTimestamp;
+    if (s.timestampFormat) $("compTimestampFormat").value = s.timestampFormat;
   } catch (e) { /* 忽略 */ }
 }
-["destPath", "compDestDir", "compName"].forEach((id) => {
+["destPath", "compDestDir", "compName", "compAutoTimestamp", "compTimestampFormat"].forEach((id) => {
   $(id).addEventListener("change", saveUIState);
 });
 

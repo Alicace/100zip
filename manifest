@@ -1,5 +1,5 @@
 appname               = 100zip
-version               = 0.5.18
+version               = 0.5.19
 display_name          = 100解压
 desc                  = <div><strong>100zip</strong><br/>飞牛原生压缩 / 解压工具：<br/>• 解压 40+ 格式（7z / zip / rar / tar 全家 / zst / iso / wim / 分卷包…）<br/>• 创建 7z / zip / tar / gz / bz2 / xz 压缩包（AES-256、文件名加密、分卷）<br/>• 中文文件名编码自动修复、密码、任务队列<br/><strong>权限说明</strong>：首次使用需在应用内授权要访问的目录。</div>
 platform              = x86
@@ -13,4 +13,4 @@ desktop_uidir         = ui
 desktop_applaunchname = 100zip.main
 micro_app             = true
 ctl_stop              = true
-changelog             = 增强 GitHub 版本检查与升级提示；设置页显示应用版本与平台信息；检测到新版本时提供绿色升级入口
+changelog             = 压缩文件名支持自动添加日期或日期时间戳；保留自定义命名和批量压缩规则
