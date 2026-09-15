@@ -55,6 +55,13 @@ foreach ($item in @("manifest", "config", "cmd", "wizard", "app", "ICON.PNG", "I
   Copy-Item -LiteralPath $src -Destination $stage -Recurse -Force
 }
 
+# 将公开版本清单一并放入网页资源，保证 FPK 内也带有可审计的版本信息。
+$versionManifest = Join-Path $root "version.json"
+if (-not (Test-Path $versionManifest)) { throw "缺少版本清单：$versionManifest" }
+try { Get-Content -Raw -LiteralPath $versionManifest | ConvertFrom-Json | Out-Null }
+catch { throw "version.json 不是有效 JSON：$versionManifest" }
+Copy-Item -LiteralPath $versionManifest -Destination (Join-Path $stage "app\www\version.json") -Force
+
 # platform 重写（防御：manifest 若被改过）
 $stagedManifest = Join-Path $stage "manifest"
 (Get-Content -Raw -LiteralPath $stagedManifest) -replace '(?m)^platform\s*=.*$', "platform              = $Platform" |
