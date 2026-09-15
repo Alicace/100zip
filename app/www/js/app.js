@@ -766,21 +766,28 @@ const EXT_MAP = {
   "zst": ".zst", "lz4": ".lz4", "br": ".br",
 };
 function currentExt() { return EXT_MAP[$("compFormat").value] || ".7z"; }
-function compressionTimestamp() {
-  if (!( $("compAutoTimestamp") && $("compAutoTimestamp").checked )) return "";
-  const now = new Date();
-  const pad = (n) => String(n).padStart(2, "0");
-  const date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+const TIMESTAMP_SUFFIX_RE = /[-_]\d{4}-\d{2}-\d{2}(?:[-_]\d{2}-\d{2}-\d{2})?$/;
+function formatCompressionTimestamp(parts) {
+  const date = String(parts.date || "");
+  const time = String(parts.time || "");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}-\d{2}-\d{2}$/.test(time)) {
+    throw new Error("NAS 返回的本地时间格式无效，请稍后重试");
+  }
   return $("compTimestampFormat").value === "date"
     ? date
-    : `${date}_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+    : `${date}-${time}`;
+}
+async function compressionTimestamp() {
+  if (!($("compAutoTimestamp") && $("compAutoTimestamp").checked)) return "";
+  const data = await api("/api/time");
+  return formatCompressionTimestamp(data);
 }
 function archiveBaseName(name) {
   return String(name || "").replace(/\.(7z|zip|tar|tar\.gz|tar\.bz2|tar\.xz|gz|bz2|xz|zst|lz4|br)$/i, "");
 }
 function addCompressionTimestamp(name, stamp) {
-  const base = archiveBaseName(name).replace(/_(\d{4}-\d{2}-\d{2})(?:_\d{2}-\d{2}-\d{2})?$/, "");
-  return stamp ? `${base}_${stamp}` : base;
+  const base = archiveBaseName(name).replace(TIMESTAMP_SUFFIX_RE, "").trim();
+  return stamp ? `${base || "任务1"}-${stamp}` : base;
 }
 function syncCompExt() {
   const cur = $("compName").value.trim();
@@ -790,7 +797,7 @@ function syncCompExt() {
 function compDestination(stamp = "") {
   const dir = $("compDestDir").value.trim().replace(/\/+$/, "") || "/";
   let name = $("compName").value.trim();
-  if (!name) name = "archive";
+  if (!name) name = $("compAutoTimestamp").checked ? "任务1" : "archive";
   name = addCompressionTimestamp(name, stamp) + currentExt();
   return dir + "/" + name.replace(/^\/+/, "");
 }
@@ -828,12 +835,34 @@ $("compSplitUnit").addEventListener("change", syncSplitHint);
 function syncTimestampOptions() {
   const enabled = $("compAutoTimestamp").checked;
   $("compTimestampFormat").disabled = !enabled;
+  $("compTimestampHint").classList.remove("error");
   $("compTimestampHint").textContent = enabled
-    ? `任务开始时自动添加${$("compTimestampFormat").value === "date" ? "日期" : "日期和时间"}，例如：我的资料_${$("compTimestampFormat").value === "date" ? "2026-09-15" : "2026-09-15_14-30-00"}${currentExt()}`
-    : "开启后会在文件名扩展名前自动添加时间戳。";
+    ? `使用 NAS 本地时间自动追加${$("compTimestampFormat").value === "date" ? "日期" : "日期和时间"}，例如：任务1-${$("compTimestampFormat").value === "date" ? "2026-09-15" : "2026-09-15-14-30-00"}${currentExt()}`
+    : "勾选后会在文件名扩展名前自动添加 NAS 本地时间。";
 }
-$("compAutoTimestamp").addEventListener("change", syncTimestampOptions);
-$("compTimestampFormat").addEventListener("change", syncTimestampOptions);
+let timestampSyncToken = 0;
+async function syncTimestampedName() {
+  const token = ++timestampSyncToken;
+  const input = $("compName");
+  if (!$("compAutoTimestamp").checked) {
+    const base = archiveBaseName(input.value.trim()).replace(TIMESTAMP_SUFFIX_RE, "").trim();
+    if (base && base !== archiveBaseName(input.value.trim())) input.value = base + currentExt();
+    return;
+  }
+  try {
+    const stamp = await compressionTimestamp();
+    if (token !== timestampSyncToken) return;
+    const base = archiveBaseName(input.value.trim()).replace(TIMESTAMP_SUFFIX_RE, "").trim() || "任务1";
+    input.value = addCompressionTimestamp(base, stamp) + currentExt();
+  } catch (e) {
+    if (token === timestampSyncToken) {
+      $("compTimestampHint").textContent = e.message || "无法读取 NAS 本地时间，请稍后重试。";
+      $("compTimestampHint").classList.add("error");
+    }
+  }
+}
+$("compAutoTimestamp").addEventListener("change", () => { syncTimestampOptions(); syncTimestampedName(); });
+$("compTimestampFormat").addEventListener("change", () => { syncTimestampOptions(); syncTimestampedName(); });
 syncSplitHint();
 syncCompressionAdvanced();
 syncTimestampOptions();
@@ -850,7 +879,9 @@ $("compPassword").addEventListener("input", () => {
 
 $("btnCompress").addEventListener("click", async () => {
   const sources = [...srcItems];
-  const taskTimestamp = compressionTimestamp();
+  let taskTimestamp = "";
+  try { taskTimestamp = await compressionTimestamp(); }
+  catch (e) { return toast(e.message || "无法读取 NAS 本地时间，请稍后重试", true); }
   const dest = compDestination(taskTimestamp);
   if (!sources.length || !dest) return toast("请填写来源与输出文件", true);
   const password = $("compPassword").value;

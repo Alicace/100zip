@@ -197,20 +197,24 @@
           <label class="inline ml-auto"><input id="compBatch" type="checkbox" /> 每个来源单独打包</label>
         </div>
       </div>
-      <div class="card">
+      <div class="card compression-options-card">
         <h3>格式与选项</h3>
         <div class="opt-grid">
           <div class="opt opt-wide">
             <label>压缩文件名</label>
-            <input id="compName" type="text" placeholder="例如：我的资料（扩展名会随格式自动变更）" />
-            <p class="hint">只填写文件名即可，.zip / .7z 等扩展名会跟随上方格式自动更新。</p>
-            <div class="timestamp-options">
-              <label class="inline"><input id="compAutoTimestamp" type="checkbox" /> 自动添加时间</label>
-              <select id="compTimestampFormat" aria-label="时间格式">
-                <option value="date">日期（2026-09-15）</option>
-                <option value="datetime" selected>日期和时间（2026-09-15_14-30-00）</option>
-              </select>
+            <div class="name-timestamp-row">
+              <div class="name-input-wrap">
+                <input id="compName" type="text" placeholder="例如：我的资料（扩展名会随格式自动变更）" />
+              </div>
+              <div class="timestamp-inline">
+                <label class="inline"><input id="compAutoTimestamp" type="checkbox" /> 自动添加时间</label>
+                <select id="compTimestampFormat" aria-label="时间格式">
+                  <option value="date">日期（2026-09-15）</option>
+                  <option value="datetime" selected>日期和时间（2026-09-15-14-30-00）</option>
+                </select>
+              </div>
             </div>
+            <p class="hint">只填写文件名即可，.zip / .7z 等扩展名会跟随上方格式自动更新。</p>
             <p class="hint" id="compTimestampHint">开启后会在文件名扩展名前自动添加时间戳。</p>
           </div>
           <div class="opt">

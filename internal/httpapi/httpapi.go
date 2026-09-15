@@ -53,6 +53,7 @@ func (s *Server) Routes() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", s.handleHealth)
 	mux.HandleFunc("GET /api/capabilities", s.handleCapabilities)
+	mux.HandleFunc("GET /api/time", s.handleTime)
 	mux.HandleFunc("GET /api/context", s.handleContext)
 	mux.HandleFunc("POST /api/archive/list", s.handleList)
 	mux.HandleFunc("POST /api/archive/extract", s.handleExtract)
@@ -154,6 +155,19 @@ func withRecover(next http.Handler) http.Handler {
 
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 	ok(w, map[string]any{"status": "ok", "version": s.Version})
+}
+
+// handleTime 返回 NAS 操作系统的本地时间，供文件名时间戳使用。
+// 不使用浏览器时间，避免用户设备时区与 NAS 时区不一致。
+func (s *Server) handleTime(w http.ResponseWriter, r *http.Request) {
+	now := time.Now()
+	ok(w, map[string]any{
+		"now":      now.Format(time.RFC3339Nano),
+		"date":     now.Format("2006-01-02"),
+		"time":     now.Format("15-04-05"),
+		"timezone": now.Location().String(),
+		"unix":     now.Unix(),
+	})
 }
 
 func (s *Server) handleCapabilities(w http.ResponseWriter, r *http.Request) {

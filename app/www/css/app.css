@@ -178,14 +178,24 @@ main { max-width: 1080px; margin: 0 auto; padding: 16px 18px 96px; }
 .opt-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
 .opt-wide { grid-column: 1 / -1; }
 .opt-wide input { width: 100%; }
+.compression-options-card {
+  background: linear-gradient(135deg, var(--surface) 0%, var(--accent-soft) 155%);
+}
+.name-timestamp-row { display: flex; align-items: stretch; gap: 10px; }
+.name-input-wrap { flex: 1 1 360px; min-width: 220px; }
+.timestamp-inline {
+  display: flex; align-items: center; gap: 9px; flex: 0 1 auto;
+  min-width: 300px; padding: 0 10px; border: 1px solid var(--line);
+  border-radius: var(--r-ctl); background: linear-gradient(135deg, var(--surface-soft), var(--accent-soft));
+}
+.timestamp-inline select { width: auto; min-width: 210px; min-height: 32px; padding-top: 4px; padding-bottom: 4px; }
+.timestamp-inline:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.timestamp-inline select:disabled { opacity: .55; }
 .split-input { display: flex; gap: 6px; }
 .split-input input { flex: 1; min-width: 0; }
 .split-input select { width: 78px; }
 .comp-checks { flex-wrap: wrap; margin-top: 10px; }
 .opt { display: flex; flex-direction: column; gap: 6px; }
-.timestamp-options { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
-.timestamp-options select { width: auto; min-width: 220px; min-height: 32px; padding-top: 4px; padding-bottom: 4px; }
-.timestamp-options select:disabled { opacity: .55; }
 label { display: block; color: var(--muted); font-size: 12px; margin: 10px 0 4px; }
 label.inline { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 13px; color: var(--ink); }
 input[type=text], input[type=password], textarea, select {
@@ -534,4 +544,8 @@ body.dark .toast { background: #2c333c; color: #e7e9ee; border: 1px solid var(--
   .job-title { font-size: 14px; }
   .job-line2 { margin-top: 4px; }
   .job-actions .btn { min-height: 34px; }
+  .name-timestamp-row { flex-direction: column; gap: 8px; }
+  .name-input-wrap { min-width: 0; }
+  .timestamp-inline { min-width: 0; width: 100%; justify-content: space-between; padding: 8px 10px; }
+  .timestamp-inline select { min-width: 0; flex: 1 1 auto; }
 }

@@ -2,5 +2,5 @@
   "version": "0.5.19",
   "release_url": "https://github.com/Alicace/100zip/releases/tag/v0.5.19",
   "published_at": "2026-09-15",
-  "release_notes": "压缩文件名支持自动添加日期或日期时间戳；批量压缩使用同一任务时间戳。"
+  "release_notes": "时间选项移至文件名旁；支持任务1自动命名，并使用NAS本地时间生成日期或日期时间戳。"
 }
