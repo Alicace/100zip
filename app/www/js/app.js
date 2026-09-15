@@ -18,6 +18,8 @@ const APP_BASE = (() => {
 
 let currentVersion = "dev";
 let latestRelease = null;
+const VERSION_MANIFEST_URL = "https://raw.githubusercontent.com/Alicace/100zip/main/version.json";
+const RELEASES_API_URL = "https://api.github.com/repos/Alicace/100zip/releases/latest";
 
 function normalizeVersion(value) {
   const m = String(value == null ? "" : value).trim().replace(/^v/i, "").match(/^(\d+(?:\.\d+){0,3})/);
@@ -63,15 +65,20 @@ async function checkForUpdates({ silent = false } = {}) {
   check.disabled = true;
   if (!silent) hint.textContent = "正在检查最新版本…";
   try {
-    const res = await fetch("https://api.github.com/repos/Alicace/100zip/releases/latest", {
-      headers: { Accept: "application/vnd.github+json" },
+    // 版本清单走 raw.githubusercontent.com，不占用 GitHub Releases API 的公共配额。
+    // 加时间参数避免 NAS/浏览器长期复用旧的 CDN 响应；version.json 本身不包含用户数据。
+    const manifestRes = await fetch(`${VERSION_MANIFEST_URL}?t=${Date.now()}`, {
       cache: "no-store",
     });
-    if (!res.ok) throw new Error("暂时无法连接更新服务");
-    const rel = await res.json();
-    const latest = String(rel.tag_name || rel.name || "").replace(/^v/i, "").trim();
-    if (!normalizeVersion(latest).length) throw new Error("GitHub 未返回有效版本号");
-    latestRelease = { version: latest, url: rel.html_url || "https://github.com/Alicace/100zip/releases", publishedAt: rel.published_at || "" };
+    if (!manifestRes.ok) throw new Error(`版本清单请求失败（HTTP ${manifestRes.status}）`);
+    const manifest = await manifestRes.json();
+    const latest = String(manifest.version || "").replace(/^v/i, "").trim();
+    if (!normalizeVersion(latest).length) throw new Error("版本清单未返回有效版本号");
+    latestRelease = {
+      version: latest,
+      url: manifest.release_url || manifest.url || "https://github.com/Alicace/100zip/releases",
+      publishedAt: manifest.published_at || "",
+    };
     const newer = compareVersions(latest, currentVersion) > 0;
     if (newer) {
       renderUpdateState("available");
@@ -81,7 +88,27 @@ async function checkForUpdates({ silent = false } = {}) {
     }
     return newer;
   } catch (e) {
-    if (!silent) renderUpdateState("error", e.message + "。可稍后重试。");
+    // 兼容旧版部署或 raw CDN 临时不可用时，才回退到 Releases API。
+    try {
+      const res = await fetch(RELEASES_API_URL, {
+        headers: { Accept: "application/vnd.github+json" },
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error(`更新服务暂不可用（HTTP ${res.status}）`);
+      const rel = await res.json();
+      const latest = String(rel.tag_name || rel.name || "").replace(/^v/i, "").trim();
+      if (!normalizeVersion(latest).length) throw new Error("GitHub 未返回有效版本号");
+      latestRelease = { version: latest, url: rel.html_url || "https://github.com/Alicace/100zip/releases", publishedAt: rel.published_at || "" };
+      const newer = compareVersions(latest, currentVersion) > 0;
+      if (newer) renderUpdateState("available");
+      else {
+        latestRelease = null;
+        renderUpdateState("current", `当前已是最新版本 v${currentVersion || latest}。`);
+      }
+      return newer;
+    } catch (fallbackError) {
+      if (!silent) renderUpdateState("error", `${fallbackError.message}。可稍后重试。`);
+    }
     return false;
   } finally {
     check.disabled = false;
